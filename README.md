@@ -1,129 +1,115 @@
 
 
-```markdown
-# 🔐 Secure TLS 1.3 Messaging App with Digital Signatures
+````markdown
+# Custom TLS-like Chat Application (Python)
 
-This project demonstrates a **secure messaging application** simulating a **TLS 1.3 handshake**, including:
+This project demonstrates a basic client-server secure communication channel implemented in Python, using the `cryptography` library to simulate key aspects of a **TLS handshake** and secure messaging.
 
-- **ECDHE key exchange** for perfect forward secrecy
-- **Digital signatures** for handshake and message authentication
-- **Session key derivation using HKDF**
-- **Encrypted messaging** with AES-GCM or ChaCha20-Poly1305
-
-> ⚠️ Note: This is a **learning/demo implementation** and not production-grade TLS.
-
----
+It utilizes:
+* **X25519 (ECDHE)** for ephemeral key exchange and shared secret generation.
+* **HKDF-SHA256** for session key derivation.
+* **RSA-PSS with SHA256** for server authentication (digital signature on the handshake).
+* **AES-256-GCM (AEAD)** for authenticated, symmetric encryption of chat messages.
+* **HMAC-SHA256** for "Finished" handshake verification.
 
 ## 📁 Project Structure
 
-```
+The project consists of three main files:
 
-.
-├── server.py            # TLS 1.3-style server implementation
-├── client.py            # TLS 1.3-style client implementation
-├── crypto_utils.py      # Cryptographic primitives (ECDHE, RSA, AES-GCM, HKDF, signatures)
-├── README.md            # This file
+* `crypto_utils.py`: Contains all the cryptographic helper functions (key generation, ECDHE, signing, HKDF, AES-GCM) built on top of the `cryptography` library.
+* `server.py`: The main server application that listens for connections, performs the handshake, and handles encrypted chat messages.
+* `client.py`: The client application that initiates the connection, performs the handshake, and allows a user to send and receive encrypted messages.
 
-````
+## 🛠️ Setup and Installation
 
----
+### 1. Prerequisites
 
-## 🛠 Requirements
+You must have **Python 3.6+** installed.
 
-- Python 3.10+
-- `cryptography` library
-- `pickle` (built-in)
-- `os` (built-in)
-- `threading` (built-in)
+### 2. Install Dependencies
 
-> Optional: x25519 support is included in the `cryptography` library
-
-### Install dependencies
+This project requires the `cryptography` library.
 
 ```bash
 pip install cryptography
 ````
 
----
+### 3\. Running the Applications
 
-## 🚀 Setup & Usage
+Since this is a client-server application, you need to run the server first, and then one or more clients.
 
-### 1. Clone or download the repository
+#### Step A: Start the Server
 
-```bash
-git clone <repository_url>
-cd <project_directory>
-```
-
-### 2. Start the server
+Open your terminal and run the server script:
 
 ```bash
 python server.py
 ```
 
-* Server listens on `localhost:8443`
-* Generates ephemeral ECDHE keys, RSA keys, and a self-signed certificate
+You should see an output similar to:
 
-### 3. Start the client
+```
+[LISTENING] Server on localhost:8443
+```
+
+#### Step B: Start the Client(s)
+
+Open a **new** terminal window (or multiple for a multi-user chat demo) and run the client script:
 
 ```bash
 python client.py
 ```
 
-* Connects to server and performs TLS 1.3-style handshake
-* Derives session key and verifies handshake signatures
-* Enters **encrypted chat mode**
+The client will immediately attempt to connect to the server and begin the handshake.
 
-### 4. Chat
+**Server Output during Handshake:**
 
-* Type messages in the client terminal to send encrypted messages
-* Server prints decrypted messages and verifies signatures
-* Sequence numbers prevent replay attacks
+```
+[+] Client connected from ('127.0.0.1', 50000)
+[TLS] Step 1: ClientHello received
+[TLS] Step 2: ServerHello + Certificate sent | Cipher: AES-GCM-256
+[TLS] Step 3: Shared secret derived via ECDHE
+[TLS] Step 4: Session key derived (HKDF)
+[TLS] Step 5: Client Finished verified ✅
+[TLS] Step 6: Server Finished sent ✅
+[TLS] ✅ Handshake complete — Secure channel established
+```
 
----
+**Client Output during Handshake:**
 
-## ⚙ How It Works
+```
+[TLS] Step 1: ClientHello sent
+[TLS] Step 2: ServerHello received and verified ✅ | Cipher: AES-GCM-256
+[TLS] Step 3: Shared secret computed
+[TLS] Step 4: Session key derived (HKDF)
+[TLS] Step 5: Client Finished sent ✅
+[TLS] Step 6: Server Finished verified ✅
+[TLS] ✅ Handshake complete — Secure channel established
+You:
+```
 
-### Handshake
+You can now type messages in the client window(s).
 
-1. Client sends `ClientHello` (supported cipher suites + ECDHE public key)
-2. Server sends `ServerHello` + certificate + signature
-3. Both derive shared secret via **ECDHE**
-4. Session key derived with **HKDF**
-5. Client and server exchange **Finished messages** (HMAC over handshake)
+## 💬 Usage and Protocol Details
 
-### Encrypted Messaging
+### Handshake Flow (Simulated TLS 1.3/1.2 Hybrid)
 
-* Messages encrypted with **AES-GCM** (or ChaCha20-Poly1305) using session key
-* Messages signed with **RSA-PSS**
-* Server verifies signatures and sends acknowledgement
+1.  **ClientHello:** Client sends its X25519 public key, a random nonce (`client_random`), and supported cipher suites.
+2.  **ServerHello:** Server selects a cipher suite, sends its X25519 public key, a random nonce (`server_random`), and its **self-signed RSA certificate**. The server also sends an **RSA-PSS signature** over the concatenated handshake data (`client_random + server_random + server_ecdhe_pub`).
+3.  **Authentication:** The client verifies the server's signature using the public key from the certificate.
+4.  **Key Exchange:** Both client and server independently compute the **shared secret** using their private X25519 key and the peer's public X25519 key.
+5.  **Key Derivation:** Both parties use **HKDF-SHA256** to expand the shared secret into a strong **session key** (32 bytes).
+6.  **Finished Messages:** Client and Server exchange HMAC-SHA256 "Finished" messages over specific labels, using the new session key. This confirms that both parties possess the correct session key.
 
-### Security Features
+### Secure Messaging
 
-* Ephemeral ECDHE for **Perfect Forward Secrecy**
-* RSA signatures for **authentication**
-* HKDF for session key derivation
-* Sequence numbers for **replay attack prevention**
+Once the handshake is complete, all messages are secured:
 
----
+  * **Encryption:** Messages are encrypted using **AES-GCM-256**. The output includes the 12-byte nonce followed by the ciphertext and the 16-byte authentication tag.
+  * **Authentication & Integrity:** Every message is signed by the sender using their long-term **RSA key** and **RSA-PSS with SHA256**. This provides a second layer of authentication and message integrity *after* the initial handshake.
+  * **Sequence Number:** A simple sequence number is included to detect basic replay attacks or out-of-order delivery (though the current implementation only prevents replay of the very next message).
 
-## 📝 Notes
+<!-- end list -->
 
-* Self-signed certificates are used for demo purposes; there is no CA validation
-* Cipher suites negotiation is simplified
-* This project is designed for **learning and demonstration of TLS 1.3 concepts**
-* **Not recommended for production use**
-
-``````
-
----
-
-✅ This version uses:
-
-- Proper `#`, `##`, `###` headings  
-- `-` or `*` for bullet points  
-- Triple backticks ````` for code blocks  
-- Adequate spacing for GitHub Markdown rendering  
-
-
-``````
+```
+```
