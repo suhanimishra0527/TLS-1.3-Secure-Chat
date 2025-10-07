@@ -11,16 +11,16 @@ from datetime import datetime, timedelta
 HOST = 'localhost'
 PORT = 8443
 
-# ---- 1️⃣ Generate Server Keys ----
+#1️⃣ Generate Server Keys 
 server_rsa_priv, server_rsa_pub = generate_rsa_keypair()      # For signature
 server_ecdhe_priv, server_ecdhe_pub = generate_ecdhe_keys()   # For ECDHE
 
-# ---- Supported Cipher Suites ----
+# Supported Cipher Suites 
 supported_suites = ["AES-GCM-256", "ChaCha20-Poly1305"]
 
 clients = []
 
-# ---- Self-Signed Certificate ----
+# Self-Signed Certificate 
 def generate_self_signed_cert(priv_key, pub_key):
     subject = issuer = x509.Name([
         x509.NameAttribute(NameOID.COMMON_NAME, u"Demo TLS Server"),
@@ -106,7 +106,7 @@ def handle_client(conn, addr):
 
         clients.append(conn)
 
-        # ---- Encrypted Chat Loop ----
+        # Encrypted Chat Loop 
         while True:
             data = conn.recv(4096)
             if not data:
@@ -151,7 +151,7 @@ def handle_client(conn, addr):
         print(f"[-] Client disconnected: {addr}")
 
 
-# ---- Server Main Loop ----
+# Server Main Loop 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
 s.listen(5)
