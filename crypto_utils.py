@@ -8,9 +8,7 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
-# ---------------------------
 # Key generation / ECDHE (X25519)
-# ---------------------------
 
 def generate_ecdhe_keys() -> Tuple[x25519.X25519PrivateKey, x25519.X25519PublicKey]:
     """
@@ -29,9 +27,7 @@ def derive_shared_secret(priv: x25519.X25519PrivateKey, peer_pub: x25519.X25519P
     return priv.exchange(peer_pub)
 
 
-# ---------------------------
 # RSA keypair for signing (certificate-like)
-# ---------------------------
 
 def generate_rsa_keypair(key_size: int = 2048) -> Tuple[rsa.RSAPrivateKey, rsa.RSAPublicKey]:
     """
@@ -43,10 +39,7 @@ def generate_rsa_keypair(key_size: int = 2048) -> Tuple[rsa.RSAPrivateKey, rsa.R
     return private_key, public_key
 
 
-# ---------------------------
-# Sign / Verify helpers (RSA-PSS with SHA256)
-# ---------------------------
-
+# Sign / Verify helpers (RSA-PSS with SHA256
 def sign_data(priv_key: rsa.RSAPrivateKey, data: bytes) -> bytes:
     """
     Sign `data` with RSA-PSS + SHA256 and return the signature bytes.
@@ -77,9 +70,9 @@ def verify_signature(pub_key: rsa.RSAPublicKey, signature: bytes, data: bytes) -
     )
 
 
-# ---------------------------
+
 # HKDF-based session key derivation
-# ---------------------------
+
 
 def hkdf_expand(shared_secret: bytes, length: int = 32, info: bytes = b"handshake data") -> bytes:
     """
@@ -95,9 +88,8 @@ def hkdf_expand(shared_secret: bytes, length: int = 32, info: bytes = b"handshak
     return hkdf.derive(shared_secret)
 
 
-# ---------------------------
 # HMAC helper used for "Finished" verify_data
-# ---------------------------
+
 
 def hkdf_hmac(key: bytes, label: bytes) -> bytes:
     """
@@ -109,9 +101,9 @@ def hkdf_hmac(key: bytes, label: bytes) -> bytes:
     return h.finalize()
 
 
-# ---------------------------
+
 # AEAD encrypt / decrypt (AES-GCM)
-# ---------------------------
+
 
 def _derive_aes_key(session_key: bytes, length: int = 32) -> bytes:
     """
@@ -155,9 +147,9 @@ def decrypt_message(session_key: bytes, data: bytes, aad: bytes = None) -> bytes
     return plaintext
 
 
-# ---------------------------
+
 # Convenience: Serialization helpers (optional)
-# ---------------------------
+
 
 def serialize_public_key(pub_key) -> bytes:
     """
@@ -183,9 +175,8 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
-# ---------------------------
+
 # Key generation / ECDHE (X25519)
-# ---------------------------
 
 def generate_ecdhe_keys() -> Tuple[x25519.X25519PrivateKey, x25519.X25519PublicKey]:
     """
@@ -204,9 +195,9 @@ def derive_shared_secret(priv: x25519.X25519PrivateKey, peer_pub: x25519.X25519P
     return priv.exchange(peer_pub)
 
 
-# ---------------------------
+
 # RSA keypair for signing (certificate-like)
-# ---------------------------
+
 
 def generate_rsa_keypair(key_size: int = 2048) -> Tuple[rsa.RSAPrivateKey, rsa.RSAPublicKey]:
     """
@@ -218,9 +209,9 @@ def generate_rsa_keypair(key_size: int = 2048) -> Tuple[rsa.RSAPrivateKey, rsa.R
     return private_key, public_key
 
 
-# ---------------------------
+
 # Sign / Verify helpers (RSA-PSS with SHA256)
-# ---------------------------
+
 
 def sign_data(priv_key: rsa.RSAPrivateKey, data: bytes) -> bytes:
     """
@@ -252,9 +243,8 @@ def verify_signature(pub_key: rsa.RSAPublicKey, signature: bytes, data: bytes) -
     )
 
 
-# ---------------------------
+
 # HKDF-based session key derivation
-# ---------------------------
 
 def hkdf_expand(shared_secret: bytes, length: int = 32, info: bytes = b"handshake data") -> bytes:
     """
@@ -270,9 +260,8 @@ def hkdf_expand(shared_secret: bytes, length: int = 32, info: bytes = b"handshak
     return hkdf.derive(shared_secret)
 
 
-# ---------------------------
+
 # HMAC helper used for "Finished" verify_data
-# ---------------------------
 
 def hkdf_hmac(key: bytes, label: bytes) -> bytes:
     """
@@ -284,9 +273,9 @@ def hkdf_hmac(key: bytes, label: bytes) -> bytes:
     return h.finalize()
 
 
-# ---------------------------
+
 # AEAD encrypt / decrypt (AES-GCM)
-# ---------------------------
+
 
 def _derive_aes_key(session_key: bytes, length: int = 32) -> bytes:
     """
@@ -330,9 +319,8 @@ def decrypt_message(session_key: bytes, data: bytes, aad: bytes = None) -> bytes
     return plaintext
 
 
-# ---------------------------
+
 # Convenience: Serialization helpers (optional)
-# ---------------------------
 
 def serialize_public_key(pub_key) -> bytes:
     """
