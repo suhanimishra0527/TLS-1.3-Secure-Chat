@@ -9,16 +9,16 @@ from cryptography.hazmat.primitives import serialization
 HOST = 'localhost'
 PORT = 8443
 
-# ---- Client Keys ----
+#  Client Keys 
 client_ecdhe_priv, client_ecdhe_pub = generate_ecdhe_keys()
 client_rsa_priv, client_rsa_pub = generate_rsa_keypair()
 client_random = os.urandom(32)
 seq = 0
 
-# ---- Supported Cipher Suites ----
+# Supported Cipher Suites 
 supported_suites = ["AES-GCM-256", "ChaCha20-Poly1305"]
 
-# ---- Send ClientHello ----
+# Send ClientHello
 client_hello = {
     "ecdhe_pub": client_ecdhe_pub.public_bytes(
         encoding=serialization.Encoding.PEM,
@@ -33,7 +33,7 @@ sock.connect((HOST, PORT))
 sock.send(pickle.dumps(client_hello))
 print("[TLS] Step 1: ClientHello sent")
 
-# ---- Receive ServerHello + Verify Certificate ----
+#  Receive ServerHello + Verify Certificate
 server_hello = pickle.loads(sock.recv(4096))
 server_random = server_hello["random"]
 signature = server_hello["signature"]
@@ -46,18 +46,18 @@ handshake_data = client_random + server_random + server_hello["ecdhe_pub"]
 verify_signature(server_pub_key, signature, handshake_data)
 print(f"[TLS] Step 2: ServerHello received and verified ✅ | Cipher: {chosen_suite}")
 
-# ---- Derive Shared Secret + Session Key ----
+#  Derive Shared Secret + Session Key 
 shared_secret = derive_shared_secret(client_ecdhe_priv, server_ecdhe_pub)
 session_key = hkdf_expand(shared_secret)
 print("[TLS] Step 3: Shared secret computed")
 print("[TLS] Step 4: Session key derived (HKDF)")
 
-# ---- Send Client Finished ----
+# Send Client Finished 
 client_verify_data = hkdf_hmac(session_key, b"client finished")
 sock.send(pickle.dumps({"verify_data": client_verify_data}))
 print("[TLS] Step 5: Client Finished sent ✅")
 
-# ---- Receive Server Finished ----
+#  Receive Server Finished
 server_finished = pickle.loads(sock.recv(4096))
 server_verify_data = server_finished["verify_data"]
 expected_server_verify = hkdf_hmac(session_key, b"server finished")
@@ -69,7 +69,7 @@ else:
     sock.close()
     exit()
 
-# ---- Encrypted Chat Loop ----
+#  Encrypted Chat Loop
 def receive_messages():
     while True:
         try:
