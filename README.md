@@ -70,21 +70,21 @@ The client will immediately attempt to connect to the server and begin the hands
 [TLS] Step 2: ServerHello + Certificate sent | Cipher: AES-GCM-256
 [TLS] Step 3: Shared secret derived via ECDHE
 [TLS] Step 4: Session key derived (HKDF)
-[TLS] Step 5: Client Finished verified ✅
-[TLS] Step 6: Server Finished sent ✅
-[TLS] ✅ Handshake complete — Secure channel established
+[TLS] Step 5: Client Finished verified 
+[TLS] Step 6: Server Finished sent 
+[TLS]  Handshake complete — Secure channel established
 ```
 
 **Client Output during Handshake:**
 
 ```
 [TLS] Step 1: ClientHello sent
-[TLS] Step 2: ServerHello received and verified ✅ | Cipher: AES-GCM-256
+[TLS] Step 2: ServerHello received and verified  | Cipher: AES-GCM-256
 [TLS] Step 3: Shared secret computed
 [TLS] Step 4: Session key derived (HKDF)
-[TLS] Step 5: Client Finished sent ✅
-[TLS] Step 6: Server Finished verified ✅
-[TLS] ✅ Handshake complete — Secure channel established
+[TLS] Step 5: Client Finished sent 
+[TLS] Step 6: Server Finished verified 
+[TLS]  Handshake complete — Secure channel established
 You:
 ```
 
