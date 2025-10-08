@@ -44,7 +44,7 @@ chosen_suite = server_hello["cipher_suite"]
 
 handshake_data = client_random + server_random + server_hello["ecdhe_pub"]
 verify_signature(server_pub_key, signature, handshake_data)
-print(f"[TLS] Step 2: ServerHello received and verified ✅ | Cipher: {chosen_suite}")
+print(f"[TLS] Step 2: ServerHello received and verified  | Cipher: {chosen_suite}")
 
 #  Derive Shared Secret + Session Key 
 shared_secret = derive_shared_secret(client_ecdhe_priv, server_ecdhe_pub)
@@ -55,17 +55,17 @@ print("[TLS] Step 4: Session key derived (HKDF)")
 # Send Client Finished 
 client_verify_data = hkdf_hmac(session_key, b"client finished")
 sock.send(pickle.dumps({"verify_data": client_verify_data}))
-print("[TLS] Step 5: Client Finished sent ✅")
+print("[TLS] Step 5: Client Finished sent ")
 
 #  Receive Server Finished
 server_finished = pickle.loads(sock.recv(4096))
 server_verify_data = server_finished["verify_data"]
 expected_server_verify = hkdf_hmac(session_key, b"server finished")
 if server_verify_data == expected_server_verify:
-    print("[TLS] Step 6: Server Finished verified ✅")
-    print("[TLS] ✅ Handshake complete — Secure channel established")
+    print("[TLS] Step 6: Server Finished verified ")
+    print("[TLS]  Handshake complete — Secure channel established")
 else:
-    print("[TLS] Step 6: Server Finished FAILED ❌")
+    print("[TLS] Step 6: Server Finished FAILED ")
     sock.close()
     exit()
 
@@ -98,6 +98,6 @@ while True:
     }
     sock.send(pickle.dumps(msg_dict))
     seq += 1
-    print("[TLS] Encrypted message sent ✅")
+    print("[TLS] Encrypted message sent ")
 
 
