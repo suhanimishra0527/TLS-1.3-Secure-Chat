@@ -26,7 +26,7 @@ The project consists of three main files:
 
 You must have **Python 3.6+** installed.
 
-### 2. Install Dependencies
+2. Install Dependencies
 
 This project requires the `cryptography` library.
 
