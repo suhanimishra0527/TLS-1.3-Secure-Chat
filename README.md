@@ -12,7 +12,7 @@ It utilizes:
 * **AES-256-GCM (AEAD)** for authenticated, symmetric encryption of chat messages.
 * **HMAC-SHA256** for "Finished" handshake verification.
 
-## 📁 Project Structure
+ 📁 Project Structure
 
 The project consists of three main files:
 
@@ -20,9 +20,9 @@ The project consists of three main files:
 * `server.py`: The main server application that listens for connections, performs the handshake, and handles encrypted chat messages.
 * `client.py`: The client application that initiates the connection, performs the handshake, and allows a user to send and receive encrypted messages.
 
-## 🛠️ Setup and Installation
+ Setup and Installation
 
-### 1. Prerequisites
+ 1. Prerequisites
 
 You must have **Python 3.6+** installed.
 
@@ -34,11 +34,11 @@ This project requires the `cryptography` library.
 pip install cryptography
 ````
 
-### 3\. Running the Applications
+ 3\. Running the Applications
 
 Since this is a client-server application, you need to run the server first, and then one or more clients.
 
-#### Step A: Start the Server
+ Step A: Start the Server
 
 Open your terminal and run the server script:
 
@@ -90,9 +90,9 @@ You:
 
 You can now type messages in the client window(s).
 
-## 💬 Usage and Protocol Details
+ Usage and Protocol Details
 
-### Handshake Flow (Simulated TLS 1.3/1.2 Hybrid)
+Handshake Flow (Simulated TLS 1.3/1.2 Hybrid)
 
 1.  **ClientHello:** Client sends its X25519 public key, a random nonce (`client_random`), and supported cipher suites.
 2.  **ServerHello:** Server selects a cipher suite, sends its X25519 public key, a random nonce (`server_random`), and its **self-signed RSA certificate**. The server also sends an **RSA-PSS signature** over the concatenated handshake data (`client_random + server_random + server_ecdhe_pub`).
@@ -101,7 +101,7 @@ You can now type messages in the client window(s).
 5.  **Key Derivation:** Both parties use **HKDF-SHA256** to expand the shared secret into a strong **session key** (32 bytes).
 6.  **Finished Messages:** Client and Server exchange HMAC-SHA256 "Finished" messages over specific labels, using the new session key. This confirms that both parties possess the correct session key.
 
-### Secure Messaging
+Secure Messaging
 
 Once the handshake is complete, all messages are secured:
 
