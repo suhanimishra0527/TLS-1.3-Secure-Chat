@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 HOST = 'localhost'
 PORT = 8443
 
-#1️⃣ Generate Server Keys 
+# Generate Server Keys 
 server_rsa_priv, server_rsa_pub = generate_rsa_keypair()      # For signature
 server_ecdhe_priv, server_ecdhe_pub = generate_ecdhe_keys()   # For ECDHE
 
@@ -46,21 +46,21 @@ def handle_client(conn, addr):
     sequence_number = 0
 
     try:
-        # 1️⃣ Receive ClientHello
+        #  Receive ClientHello
         client_hello = pickle.loads(conn.recv(4096))
         client_random = client_hello["random"]
         client_ecdhe_pub = serialization.load_pem_public_key(client_hello["ecdhe_pub"])
         client_suites = client_hello.get("cipher_suites", [])
         print("[TLS] Step 1: ClientHello received")
 
-        # 2️⃣ Choose Cipher Suite
+        # Choose Cipher Suite
         chosen_suite = next((s for s in supported_suites if s in client_suites), None)
         if not chosen_suite:
             print("[ERROR] No common cipher suite!")
             conn.close()
             return
 
-        # 3️⃣ Prepare ServerHello + Signature
+        # Prepare ServerHello + Signature
         server_random = os.urandom(32)
         handshake_data = client_random + server_random + server_ecdhe_pub.public_bytes(
             encoding=serialization.Encoding.PEM,
@@ -81,28 +81,28 @@ def handle_client(conn, addr):
         conn.send(pickle.dumps(server_hello))
         print(f"[TLS] Step 2: ServerHello + Certificate sent | Cipher: {chosen_suite}")
 
-        # 4️⃣ Derive shared secret + session key
+        # Derive shared secret + session key
         shared_secret = derive_shared_secret(server_ecdhe_priv, client_ecdhe_pub)
         session_key = hkdf_expand(shared_secret)
         print("[TLS] Step 3: Shared secret derived via ECDHE")
         print("[TLS] Step 4: Session key derived (HKDF)")
 
-        # 5️⃣ Receive Client Finished
+        # Receive Client Finished
         client_finished = pickle.loads(conn.recv(4096))
         client_verify_data = client_finished["verify_data"]
         expected_client_verify = hkdf_hmac(session_key, b"client finished")
         if client_verify_data == expected_client_verify:
-            print("[TLS] Step 5: Client Finished verified ✅")
+            print("[TLS] Step 5: Client Finished verified ")
         else:
-            print("[TLS] Step 5: Client Finished verification FAILED ❌")
+            print("[TLS] Step 5: Client Finished verification FAILED ")
             conn.close()
             return
 
-        # 6️⃣ Send Server Finished
+        #  Send Server Finished
         server_verify_data = hkdf_hmac(session_key, b"server finished")
         conn.send(pickle.dumps({"verify_data": server_verify_data}))
-        print("[TLS] Step 6: Server Finished sent ✅")
-        print("[TLS] ✅ Handshake complete — Secure channel established")
+        print("[TLS] Step 6: Server Finished sent ")
+        print("[TLS]  Handshake complete — Secure channel established")
 
         clients.append(conn)
 
@@ -128,10 +128,10 @@ def handle_client(conn, addr):
 
             try:
                 verify_signature(sender_pub, signature, plaintext)
-                print(f"[TLS] Message verified ✅: {plaintext.decode()}")
+                print(f"[TLS] Message verified : {plaintext.decode()}")
                 ack = f"Server: Signature OK for '{plaintext.decode()}'"
             except:
-                print(f"[TLS] Message signature FAILED ❌: {plaintext.decode()}")
+                print(f"[TLS] Message signature FAILED : {plaintext.decode()}")
                 ack = f"Server: Signature failed for '{plaintext.decode()}'"
 
             ack_encrypted = encrypt_message(session_key, ack.encode())
